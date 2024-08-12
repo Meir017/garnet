@@ -798,11 +798,11 @@ namespace Garnet.client
         /// <param name="args"></param>
         /// <param name="token"></param>
         /// <param name="tcs"></param>
-        async ValueTask InternalExecuteAsync(TcsWrapper tcs, string op, ICollection<string> args = null, CancellationToken token = default)
+        async ValueTask InternalExecuteAsync(TcsWrapper tcs, string op, string[] args = null, CancellationToken token = default)
         {
             tcs.timestamp = GetTimestamp();
             bool isArray = args != null;
-            int arraySize = 1 + (isArray ? args.Count : 0);
+            int arraySize = 1 + (isArray ? args.Length : 0);
             int totalLen = 1 + NumUtils.NumDigits(arraySize) + 2 + //array header
                 1 + NumUtils.NumDigits(op.Length) + 2 + op.Length + 2;//op header + op data
 
@@ -916,11 +916,11 @@ namespace Garnet.client
         /// <param name="args"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        async ValueTask InternalExecuteAsync(TcsWrapper tcs, Memory<byte> respOp, ICollection<Memory<byte>> args = null, CancellationToken token = default)
+        async ValueTask InternalExecuteAsync(TcsWrapper tcs, Memory<byte> respOp, Memory<byte>[] args = null, CancellationToken token = default)
         {
             tcs.timestamp = GetTimestamp();
             bool isArray = args != null;
-            int arraySize = 1 + (isArray ? args.Count : 0);
+            int arraySize = 1 + (isArray ? args.Length : 0);
             int totalLen = 1 + NumUtils.NumDigits(arraySize) + 2 + respOp.Length;
 
             if (isArray)

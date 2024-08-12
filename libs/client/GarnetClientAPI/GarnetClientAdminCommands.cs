@@ -50,12 +50,11 @@ namespace Garnet.client
         /// <returns></returns>
         public async Task<string> ReplicaOf(string address, int port, CancellationToken cancellationToken = default)
         {
-            List<Memory<byte>> args = new List<Memory<byte>>()
-            {
+            return await ExecuteForStringResultWithCancellationAsync(REPLICAOF,
+            [
                 Encoding.ASCII.GetBytes(address),
                 Encoding.ASCII.GetBytes(port.ToString())
-            };
-            return await ExecuteForStringResultWithCancellationAsync(REPLICAOF, args, cancellationToken).ConfigureAwait(false);
+            ], cancellationToken).ConfigureAwait(false);
         }
     }
 }

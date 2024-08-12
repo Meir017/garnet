@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Garnet.client.GarnetClientAPI;
@@ -26,14 +27,12 @@ namespace Garnet.client
         /// <param name="context"></param>
         public void SortedSetAdd(string key, string member, double score, Action<long, long, string> callback, long context = 0)
         {
-            var parameters = new List<Memory<byte>>
-            {
+            ExecuteForLongResult(callback, context, ZADD, 
+            [
                 Encoding.ASCII.GetBytes(key),
                 Encoding.ASCII.GetBytes(score.ToString()),
                 Encoding.ASCII.GetBytes(member)
-            };
-
-            ExecuteForLongResult(callback, context, ZADD, parameters);
+            ]);
         }
 
         /// <summary>
@@ -47,7 +46,7 @@ namespace Garnet.client
         public void SortedSetAdd(string key, SortedSetPairCollection sortedSetEntries, Action<long, long, string> callback, long context = 0)
         {
             sortedSetEntries.Elements.Insert(0, Encoding.ASCII.GetBytes(key));
-            ExecuteForLongResult(callback, context, ZADD, sortedSetEntries.Elements);
+            ExecuteForLongResult(callback, context, ZADD, [..sortedSetEntries.Elements]);
         }
 
         /// <summary>
@@ -59,14 +58,12 @@ namespace Garnet.client
         /// <returns></returns>
         public Task<long> SortedSetAddAsync(string key, string member, double score)
         {
-            var parameters = new List<Memory<byte>>
-            {
+            return ExecuteForLongResultAsync(ZADD, 
+            [
                 Encoding.ASCII.GetBytes(key),
                 Encoding.ASCII.GetBytes(score.ToString()),
                 Encoding.ASCII.GetBytes(member)
-            };
-
-            return ExecuteForLongResultAsync(ZADD, parameters);
+            ]);
         }
 
         /// <summary>
@@ -78,9 +75,7 @@ namespace Garnet.client
         /// <returns></returns>
         public Task<long> SortedSetAddAsync(string key, SortedSetPairCollection sortedSetEntries)
         {
-            sortedSetEntries.Elements.Insert(0, Encoding.ASCII.GetBytes(key));
-            var result = ExecuteForLongResultAsync(ZADD, sortedSetEntries.Elements);
-            sortedSetEntries.Elements.RemoveAt(0);
+            var result = ExecuteForLongResultAsync(ZADD, [Encoding.ASCII.GetBytes(key), ..sortedSetEntries.Elements]);
             return result;
         }
 
@@ -93,13 +88,11 @@ namespace Garnet.client
         /// <param name="context"></param>
         public void SortedSetRemove(string key, string member, Action<long, long, string> callback, long context = 0)
         {
-            var parameters = new List<Memory<byte>>
-            {
+            ExecuteForLongResult(callback, context, ZREM, 
+            [
                 Encoding.ASCII.GetBytes(key),
                 Encoding.ASCII.GetBytes(member)
-            };
-
-            ExecuteForLongResult(callback, context, ZREM, parameters);
+            ]);
         }
 
         /// <summary>
@@ -111,9 +104,7 @@ namespace Garnet.client
         /// <param name="context"></param>
         public void SortedSetRemove(string key, List<string> members, Action<long, long, string> callback, long context = 0)
         {
-            members.Insert(0, key);
-            ExecuteForLongResult(callback, context, "ZREM", members);
-            members.RemoveAt(0);
+            ExecuteForLongResult(callback, context, "ZREM", [key, ..members]);
         }
 
         /// <summary>
@@ -125,14 +116,12 @@ namespace Garnet.client
         /// <returns></returns>
         public Task<long> SortedSetRemoveAsync(string key, string member, double score)
         {
-            var parameters = new List<Memory<byte>>
-            {
+            return ExecuteForLongResultAsync(ZREM, 
+            [
                 Encoding.ASCII.GetBytes(key),
                 Encoding.ASCII.GetBytes(score.ToString()),
                 Encoding.ASCII.GetBytes(member)
-            };
-
-            return ExecuteForLongResultAsync(ZREM, parameters);
+            ]);
         }
 
         /// <summary>
@@ -143,9 +132,7 @@ namespace Garnet.client
         /// <returns></returns>
         public Task<long> SortedSetRemoveAsync(string key, SortedSetPairCollection sortedSetEntries)
         {
-            sortedSetEntries.Elements.Insert(0, Encoding.ASCII.GetBytes(key));
-            var result = ExecuteForLongResultAsync(ZREM, sortedSetEntries.Elements);
-            sortedSetEntries.Elements.RemoveAt(0);
+            var result = ExecuteForLongResultAsync(ZREM, [Encoding.ASCII.GetBytes(key), ..sortedSetEntries.Elements]);
             return result;
         }
 
